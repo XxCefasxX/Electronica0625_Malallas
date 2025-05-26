@@ -22,16 +22,21 @@ for i in range(num_mallas):
         resistencias_compartidas[j][i] = r
 
 for i in range(num_mallas):
-    # Empieza la ecuación con la resistencia propia e intensidad propia
-    ecuacion = f"{resistencias_propias[i]}·I{i+1}"
+    # Creamos lista de términos (coeficiente, índice de I)
+    terminos = [(resistencias_propias[i], i)]  # término propio: coeficiente y su índice
     
-    # Recorremos otras mallas para ver si hay resistencias compartidas
+    # Agregamos términos compartidos (coeficiente, índice)
     for j in range(num_mallas):
         if i != j and resistencias_compartidas[i][j] != 0:
-            # Agregamos término con la intensidad de la otra malla
-            ecuacion += f" + {resistencias_compartidas[i][j]}·I{j+1}"
+            terminos.append((resistencias_compartidas[i][j], j))
     
-    # Finalmente imprimimos el lado derecho (fuente)
+    # Ordenamos por índice de la intensidad (segunda posición de la tupla)
+    terminos.sort(key=lambda x: x[1])
+    
+    # Formamos la ecuación uniendo los términos ordenados
+    ecuacion = " + ".join(f"{coef}·I{idx+1}" for coef, idx in terminos)
+    
+    # Añadimos el lado derecho
     ecuacion += f" = {voltajes[i]}"
     
     print(f"Ecuación de Malla {i+1}: {ecuacion}")
